@@ -2,8 +2,6 @@
 
 import os
 import re
-from loader import load_graph_from_file
-from floyd import floyd_warshall
 from output import print_path_and_distance
 
 def extract_number(filename):
@@ -13,7 +11,7 @@ def extract_number(filename):
         g1.txt -> 1
         g10.txt -> 10
     """
-    match = re.search(r'\d+', filename)
+    match = re.search(r"\d+", filename)
     return int(match.group()) if match else 0
 
 
