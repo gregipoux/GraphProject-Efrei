@@ -15,7 +15,7 @@ def detect_cycle_negatif(L):
     return False
 
 
-def floyd_warshall(L, P, verbose=True):
+def floyd_warshall(L, P, verbose=True, show_initial=True):
     """
     Implémente l'algorithme de Floyd-Warshall.
 
@@ -23,6 +23,7 @@ def floyd_warshall(L, P, verbose=True):
     - L : matrice des distances (modifiée en place)
     - P : matrice des prédécesseurs (modifiée en place)
     - verbose : si True, affiche les matrices à chaque étape
+    - show_initial : si True, affiche l'état initial des matrices
 
     Retourne :
     - (L, P, cycle_negatif) :
@@ -32,7 +33,7 @@ def floyd_warshall(L, P, verbose=True):
     """
     n = len(L)
 
-    if verbose:
+    if verbose and show_initial:
         print_matrices(L, P, "Initialisation")
 
     for k in range(n):

@@ -3,6 +3,7 @@
 from interface import choose_graph_file, ask_for_paths
 from loader import load_graph_from_file
 from floyd import floyd_warshall
+from output import print_matrix
 
 def main():
     print("=== Projet SM501 : Algorithme de Floyd-Warshall ===")
@@ -21,10 +22,14 @@ def main():
             continue
 
         print(f"Graphe chargé avec {g.n} sommets.")
-        print("Affichage de la matrice initiale et exécution de Floyd-Warshall...\n")
+
+        print("\nAffichage matriciel du graphe (valeurs initiales) :")
+        print_matrix(g.L, "L (distances initiales)")
+
+        print("Exécution de Floyd-Warshall avec affichage des étapes intermédiaires...\n")
 
         # exécution de Floyd-Warshall (avec affichage des matrices intermédiaires)
-        L, P, cycle_negatif = floyd_warshall(g.L, g.P, verbose=True)
+        L, P, cycle_negatif = floyd_warshall(g.L, g.P, verbose=True, show_initial=False)
 
         if cycle_negatif:
             print("\nLe graphe contient au moins un circuit absorbant.")
