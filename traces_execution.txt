@@ -1,0 +1,42 @@
+
+===== TEST g1test.txt =====
+PARFAIT ! Aucun cycle négatif
+
+===== TEST g2test.txt =====
+PARFAIT ! Aucun cycle négatif
+
+===== TEST g3test.txt =====
+PARFAIT ! Aucun cycle négatif
+
+===== TEST g4test.txt =====
+ATTENTION Cycle négatif détecté
+
+===== TEST g5test.txt =====
+PARFAIT ! Aucun cycle négatif
+
+===== TEST g6test.txt =====
+ATTENTION Cycle négatif détecté
+
+===== TEST g6tests.txt =====
+X Erreur chargement : invalid literal for int() with base 10: 'Graphe 1 :'
+
+===== TEST g7test.txt =====
+PARFAIT ! Aucun cycle négatif
+
+===== TEST g8test.txt =====
+PARFAIT ! Aucun cycle négatif
+
+===== TEST g9test.txt =====
+PARFAIT ! Aucun cycle négatif
+
+===== TEST g10test.txt =====
+ATTENTION Cycle négatif détecté
+
+===== TEST g11test.txt =====
+PARFAIT ! Aucun cycle négatif
+
+===== TEST g12test.txt =====
+PARFAIT ! Aucun cycle négatif
+
+===== TEST g13test.txt =====
+ATTENTION Cycle négatif détecté
