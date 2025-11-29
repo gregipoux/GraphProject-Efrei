@@ -14,7 +14,6 @@ def detect_cycle_negatif(L):
             return True
     return False
 
-
 def floyd_warshall(L, P, verbose=True, show_initial=True):
     """
     Implémente l'algorithme de Floyd-Warshall.

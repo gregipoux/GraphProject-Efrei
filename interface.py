@@ -149,7 +149,8 @@ def display_graph_summary(graph):
 
 def ask_for_paths(L, P):
     """
-    Boucle de demande de chemins à l'utilisateur avec un menu clair.
+    Boucle de demande de chemins à l'utilisateur suivant la séquence du sujet :
+    "Chemin ? Si oui, alors Sommet de départ ? Sommet d'arrivée ? Affichage du chemin Recommencer?"
     """
     n = len(L)
     
@@ -158,35 +159,51 @@ def ask_for_paths(L, P):
     print()
 
     while True:
-        print(f"{Colors.BOLD}Options :{Colors.RESET}")
-        print(f"  {Colors.BOLD}a{Colors.RESET}. Afficher un plus court chemin")
-        print(f"  {Colors.BOLD}b{Colors.RESET}. Retour au menu principal")
+        # Question "Chemin ?"
+        reponse = input(f"{Colors.BOLD}Chemin ? (o/n) : {Colors.RESET}").strip().lower()
         
-        choix = input(f"\n{Colors.BOLD}Votre choix (a/b) : {Colors.RESET}").strip().lower()
-
-        if choix == 'b':
+        if reponse in ('n', 'non', 'q', 'quitter'):
             break
-
-        if choix != 'a':
-            print(f"{Colors.ERROR}Choix invalide. Veuillez entrer 'a' ou 'b'.{Colors.RESET}")
+        
+        if reponse not in ('o', 'oui', 'y', 'yes'):
+            print(f"{Colors.ERROR}Veuillez répondre par 'o' (oui) ou 'n' (non).{Colors.RESET}")
             continue
 
-        # Demander source et destination
-        print()
+        # Si oui, alors demander sommet de départ
         try:
-            start = int(input(f"  Sommet de départ (0-{n-1}) : ").strip())
-            end = int(input(f"  Sommet d'arrivée (0-{n-1}) : ").strip())
+            start = int(input(f"{Colors.BOLD}Sommet de départ ? (0-{n-1}) : {Colors.RESET}").strip())
         except ValueError:
-            print(f"{Colors.ERROR}Veuillez entrer des entiers valides.{Colors.RESET}")
+            print(f"{Colors.ERROR}Veuillez entrer un entier valide.{Colors.RESET}")
             continue
 
-        if not (0 <= start < n and 0 <= end < n):
-            print(f"{Colors.ERROR}Indices de sommets hors limites. Utilisez des valeurs entre 0 et {n-1}.{Colors.RESET}")
+        if not (0 <= start < n):
+            print(f"{Colors.ERROR}Indice de sommet hors limites. Utilisez une valeur entre 0 et {n-1}.{Colors.RESET}")
             continue
 
+        # Demander sommet d'arrivée
+        try:
+            end = int(input(f"{Colors.BOLD}Sommet d'arrivée ? (0-{n-1}) : {Colors.RESET}").strip())
+        except ValueError:
+            print(f"{Colors.ERROR}Veuillez entrer un entier valide.{Colors.RESET}")
+            continue
+
+        if not (0 <= end < n):
+            print(f"{Colors.ERROR}Indice de sommet hors limites. Utilisez une valeur entre 0 et {n-1}.{Colors.RESET}")
+            continue
+
+        # Affichage du chemin
         print()
         print_path_and_distance(L, P, start, end)
         print()
+
+        # Recommencer ?
+        while True:
+            recommencer = input(f"{Colors.BOLD}Recommencer ? (o/n) : {Colors.RESET}").strip().lower()
+            if recommencer in ('n', 'non', 'q', 'quitter'):
+                return  # Sortir de la fonction
+            if recommencer in ('o', 'oui', 'y', 'yes'):
+                break  # Continuer la boucle principale
+            print(f"{Colors.ERROR}Veuillez répondre par 'o' (oui) ou 'n' (non).{Colors.RESET}")
 
     print(f"{Colors.SUCCESS}Retour au menu principal.{Colors.RESET}")
 
