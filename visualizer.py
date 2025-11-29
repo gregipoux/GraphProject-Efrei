@@ -46,26 +46,28 @@ def visualize_graph(graph, output_file="graph_visualization.html", show_weights=
             11: "Montpellier",
         }
     
-    # Configuration de l'espacement selon la taille du graphe
+    # Configuration de l'espacement pour tous les graphes
+    # On augmente l'espacement pour améliorer la lisibilité
     is_large_graph = graph.n >= 10
     if is_large_graph:
-        # Pour les grands graphes, on augmente l'espacement
-        spring_length = 400
-        gravitational_constant = -5000
-        central_gravity = 0.1
+        # Pour les grands graphes, espacement encore plus important
+        spring_length = 500
+        gravitational_constant = -6000
+        central_gravity = 0.05
         node_size = 50
         font_size = 16
     else:
-        spring_length = 200
-        gravitational_constant = -2000
-        central_gravity = 0.3
-        node_size = 40
-        font_size = 20
+        # Pour les petits graphes aussi, on augmente l'espacement
+        spring_length = 350
+        gravitational_constant = -4000
+        central_gravity = 0.15
+        node_size = 45
+        font_size = 18
     
     try:
-        # Créer un réseau pyvis
+        # Créer un réseau pyvis avec une hauteur augmentée pour tous les cas
         net = Network(
-            height="800px" if is_large_graph else "600px",
+            height="900px" if is_large_graph else "700px",
             width="100%",
             directed=True,
             notebook=False,
@@ -74,11 +76,16 @@ def visualize_graph(graph, output_file="graph_visualization.html", show_weights=
         
         # Configuration pour un meilleur rendu avec labels à l'intérieur
         # Espacement augmenté pour les grands graphes
+        # La physique se désactive après stabilisation pour que les nœuds restent en place
         net.set_options(f"""
         {{
           "physics": {{
             "enabled": true,
-            "stabilization": {{"iterations": 200}},
+            "stabilization": {{
+              "enabled": true,
+              "iterations": 200,
+              "fit": true
+            }},
             "barnesHut": {{
               "gravitationalConstant": {gravitational_constant},
               "centralGravity": {central_gravity},
@@ -178,6 +185,97 @@ def visualize_graph(graph, output_file="graph_visualization.html", show_weights=
         
         # Sauvegarder le fichier HTML
         net.save_graph(output_file)
+        
+        # Ajouter du code JavaScript pour que les nœuds restent à leur position après déplacement
+        # On lit le fichier, on ajoute le script, et on le réécrit
+        with open(output_file, 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        
+        # Script JavaScript pour désactiver la physique après stabilisation
+        # et permettre aux nœuds de rester à leur position après déplacement
+        js_code = """
+        <script type="text/javascript">
+          (function() {
+            var networkInstance = null;
+            
+            // Fonction pour trouver le réseau vis.js
+            function findNetwork() {
+              // Chercher dans toutes les divs
+              var allDivs = document.querySelectorAll('div');
+              for (var i = 0; i < allDivs.length; i++) {
+                var div = allDivs[i];
+                // Pyvis stocke souvent le réseau dans une propriété du conteneur
+                if (div.network && typeof div.network.setOptions === 'function') {
+                  return div.network;
+                }
+                // Ou dans une variable globale
+                if (window.network && typeof window.network.setOptions === 'function') {
+                  return window.network;
+                }
+              }
+              return null;
+            }
+            
+            // Fonction pour configurer le réseau
+            function setupNetwork() {
+              if (!networkInstance) {
+                networkInstance = findNetwork();
+              }
+              
+              if (networkInstance) {
+                // Désactiver la physique après stabilisation
+                networkInstance.once("stabilizationEnd", function() {
+                  networkInstance.setOptions({ physics: { enabled: false } });
+                });
+                
+                // Désactiver la physique quand on commence à déplacer un nœud
+                networkInstance.on("dragStart", function() {
+                  networkInstance.setOptions({ physics: { enabled: false } });
+                });
+                
+                // S'assurer que la physique reste désactivée après relâchement
+                networkInstance.on("dragEnd", function() {
+                  networkInstance.setOptions({ physics: { enabled: false } });
+                });
+                
+                // Vérifier périodiquement et désactiver la physique si elle est activée
+                var checkInterval = setInterval(function() {
+                  if (networkInstance) {
+                    networkInstance.setOptions({ physics: { enabled: false } });
+                  }
+                }, 100);
+                
+                // Arrêter la vérification après 5 secondes
+                setTimeout(function() {
+                  clearInterval(checkInterval);
+                }, 5000);
+              }
+            }
+            
+            // Essayer plusieurs fois pour trouver le réseau
+            var attempts = 0;
+            var maxAttempts = 20;
+            var trySetup = setInterval(function() {
+              attempts++;
+              setupNetwork();
+              if (networkInstance || attempts >= maxAttempts) {
+                clearInterval(trySetup);
+              }
+            }, 200);
+          })();
+        </script>
+        """
+        
+        # Insérer le script avant la balise </body>
+        if '</body>' in html_content:
+            html_content = html_content.replace('</body>', js_code + '</body>')
+        else:
+            # Si pas de </body>, on ajoute à la fin
+            html_content += js_code
+        
+        # Réécrire le fichier avec le script ajouté
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(html_content)
         
         # Obtenir le chemin absolu pour l'ouverture
         abs_path = os.path.abspath(output_file)
