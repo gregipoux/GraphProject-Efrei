@@ -183,7 +183,6 @@ def main():
             # Quitter
             print()
             print_separator("=", 60, Colors.HEADER)
-            print(f"{Colors.SUCCESS}Merci d'avoir utilisé le programme !{Colors.RESET}")
             print(f"{Colors.SUCCESS}Au revoir.{Colors.RESET}")
             print_separator("=", 60, Colors.HEADER)
             break
