@@ -1,4 +1,6 @@
 # interface.py
+# Gestion de l'interaction avec l'utilisateur
+# On gère les menus, la sélection de graphes, et la demande de chemins
 
 import os
 import re
@@ -67,6 +69,7 @@ def list_graph_files(graphs_dir="graphs"):
         if f.lower().endswith(".txt")
     ]
 
+    # Tri numérique pour que g10.txt vienne après g9.txt
     files = sorted(files, key=extract_number)
 
     return files
@@ -108,6 +111,7 @@ def choose_graph_file(graphs_dir="graphs"):
 
     display_graph_list(graphs_dir)
 
+    # Boucle de saisie avec validation
     while True:
         choix = input(f"\n{Colors.BOLD}Sélectionnez un graphe par son numéro (1-{len(files)}) ou 'q' pour annuler : {Colors.RESET}").strip()
 
@@ -158,6 +162,7 @@ def ask_for_paths(L, P):
     print(f"Le graphe contient {n} sommets (numérotés de 0 à {n-1}).")
     print()
 
+    # Boucle principale : l'utilisateur peut demander plusieurs chemins
     while True:
         # Question "Chemin ?"
         reponse = input(f"{Colors.BOLD}Chemin ? (o/n) : {Colors.RESET}").strip().lower()
@@ -226,6 +231,7 @@ def run_automatic_tests(graphs_dir="graphs"):
     
     results = []
     
+    # On teste chaque graphe et on stocke les résultats
     for fname in files:
         path = os.path.join(graphs_dir, fname)
         try:

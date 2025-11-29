@@ -1,4 +1,6 @@
 # output.py
+# Fonctions d'affichage des matrices et de reconstruction des chemins
+# On affiche L et P, et on reconstruit les chemins à partir de P
 
 from math import inf
 
@@ -49,6 +51,7 @@ def reconstruct_path(P, start, end):
     if P[start][end] is None:
         return None
 
+    # On remonte la chaîne des prédécesseurs depuis end jusqu'à start
     chemin = [end]
     j = end
     while j != start:
@@ -58,6 +61,7 @@ def reconstruct_path(P, start, end):
             return None
         chemin.append(j)
 
+    # On inverse car on a construit le chemin à l'envers
     chemin.reverse()
     return chemin
 

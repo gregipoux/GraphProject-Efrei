@@ -1,4 +1,6 @@
 # loader.py
+# Charge un graphe depuis un fichier texte au format du sujet
+# Format : première ligne = nombre de sommets, deuxième = nombre d'arcs, puis les arcs
 
 from graph import Graph
 
@@ -17,7 +19,7 @@ def load_graph_from_file(path):
     On ignore les lignes vides et les lignes commençant par '#'.
     """
     with open(path, "r", encoding="utf-8") as f:
-        # lecture brute des lignes, en filtrant les commentaires et les vides
+        # On filtre les commentaires et les lignes vides
         lignes_utiles = []
         for ligne in f:
             ligne = ligne.strip()
@@ -38,6 +40,7 @@ def load_graph_from_file(path):
 
         g = Graph(n)
 
+        # On ajoute chaque arc au graphe
         for i in range(m):
             u_str, v_str, w_str = lignes_utiles[2 + i].split()
             u = int(u_str)

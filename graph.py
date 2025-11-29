@@ -1,4 +1,6 @@
 # graph.py
+# Structure de données pour représenter un graphe orienté valué
+# On stocke les distances dans L et les prédécesseurs dans P
 
 from math import inf
 
@@ -15,11 +17,13 @@ class Graph:
         self.n = n
 
         # Matrice des distances : L[i][j] = coût du chemin i -> j
+        # On initialise tout à inf (pas de chemin), sauf L[i][i] = 0
         self.L = [[inf] * n for _ in range(n)]
         for i in range(n):
             self.L[i][i] = 0
 
         # Matrice des prédécesseurs : P[i][j] = prédécesseur de j sur un plus court chemin depuis i
+        # On initialise tout à None, sauf P[i][i] = i
         self.P = [[None] * n for _ in range(n)]
         for i in range(n):
             self.P[i][i] = i
@@ -31,4 +35,5 @@ class Graph:
         w : int (poids, peut être négatif, nul ou positif)
         """
         self.L[u][v] = w
+        # Le prédécesseur de v sur le chemin direct u->v est u
         self.P[u][v] = u
