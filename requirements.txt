@@ -1,0 +1,7 @@
+# Dépendances pour le projet GraphProject-Efrei
+# Algorithme de Floyd-Warshall
+
+# Dépendance optionnelle pour la visualisation des graphes
+# Installer avec : pip install pyvis
+pyvis>=0.3.1
+
