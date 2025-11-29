@@ -51,7 +51,6 @@ def analyze_graph(graphs_dir="graphs"):
         g = load_graph_from_file(path)
     except Exception as e:
         print(f"{Colors.ERROR}Erreur lors du chargement du graphe : {e}{Colors.RESET}")
-        input(f"\n{Colors.WARNING}Appuyez sur Entrée pour continuer...{Colors.RESET}")
         return True  # Continue the loop
     
     display_graph_summary(g)
