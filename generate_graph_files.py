@@ -3,7 +3,7 @@
 import os
 import re
 
-SOURCE = "g6tests.txt"
+SOURCE = "GrahRecap.txt"
 TARGET_DIR = "graphs"
 
 os.makedirs(TARGET_DIR, exist_ok=True)
