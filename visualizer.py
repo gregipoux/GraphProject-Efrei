@@ -10,7 +10,7 @@ except ImportError:
     PYVIS_AVAILABLE = False
 
 
-def visualize_graph(graph, output_file="graph_visualization.html", show_weights=True):
+def visualize_graph(graph, output_file="graph_visualization.html", show_weights=True, node_labels=None):
     """
     Visualise un graphe avec pyvis.network.
     
@@ -18,6 +18,7 @@ def visualize_graph(graph, output_file="graph_visualization.html", show_weights=
     - graph : objet Graph à visualiser
     - output_file : nom du fichier HTML de sortie
     - show_weights : si True, affiche les poids sur les arcs
+    - node_labels : dictionnaire {index: nom} pour personnaliser les labels des nœuds
     
     Retourne un tuple (chemin_absolu, nombre_arcs) ou (None, 0) en cas d'erreur.
     """
@@ -26,10 +27,45 @@ def visualize_graph(graph, output_file="graph_visualization.html", show_weights=
         print("Installez-le avec : pip install pyvis")
         return None, 0
     
+    # Détection automatique de g14_application pour utiliser les noms de villes
+    is_g14 = "g14" in output_file.lower() or (node_labels is None and graph.n == 12)
+    if is_g14 and node_labels is None:
+        # Mapping des villes pour g14
+        node_labels = {
+            0: "Lille",
+            1: "Paris",
+            2: "Nantes",
+            3: "Lyon",
+            4: "Marseille",
+            5: "Toulouse",
+            6: "Bordeaux",
+            7: "Strasbourg",
+            8: "Rennes",
+            9: "Nice",
+            10: "Clermont-Ferrand",
+            11: "Montpellier",
+        }
+    
+    # Configuration de l'espacement selon la taille du graphe
+    is_large_graph = graph.n >= 10
+    if is_large_graph:
+        # Pour les grands graphes, on augmente l'espacement
+        spring_length = 400
+        gravitational_constant = -5000
+        central_gravity = 0.1
+        node_size = 50
+        font_size = 16
+    else:
+        spring_length = 200
+        gravitational_constant = -2000
+        central_gravity = 0.3
+        node_size = 40
+        font_size = 20
+    
     try:
         # Créer un réseau pyvis
         net = Network(
-            height="600px",
+            height="800px" if is_large_graph else "600px",
             width="100%",
             directed=True,
             notebook=False,
@@ -37,61 +73,70 @@ def visualize_graph(graph, output_file="graph_visualization.html", show_weights=
         )
         
         # Configuration pour un meilleur rendu avec labels à l'intérieur
-        net.set_options("""
-        {
-          "physics": {
+        # Espacement augmenté pour les grands graphes
+        net.set_options(f"""
+        {{
+          "physics": {{
             "enabled": true,
-            "stabilization": {"iterations": 100},
-            "barnesHut": {
-              "gravitationalConstant": -2000,
-              "centralGravity": 0.3,
-              "springLength": 200,
+            "stabilization": {{"iterations": 200}},
+            "barnesHut": {{
+              "gravitationalConstant": {gravitational_constant},
+              "centralGravity": {central_gravity},
+              "springLength": {spring_length},
               "springConstant": 0.04,
               "damping": 0.09
-            }
-          },
-          "nodes": {
-            "font": {
-              "size": 20,
+            }}
+          }},
+          "nodes": {{
+            "font": {{
+              "size": {font_size},
               "face": "Arial",
               "color": "#000000",
               "strokeWidth": 2,
               "strokeColor": "#ffffff",
               "align": "center"
-            },
+            }},
             "borderWidth": 2,
             "borderWidthSelected": 3,
             "shadow": true,
             "labelHighlightBold": true
-          },
-          "edges": {
-            "arrows": {
-              "to": {"enabled": true, "scaleFactor": 1.2}
-            },
-            "smooth": {
+          }},
+          "edges": {{
+            "arrows": {{
+              "to": {{"enabled": true, "scaleFactor": 1.2}}
+            }},
+            "smooth": {{
               "type": "continuous"
-            },
-            "font": {
+            }},
+            "font": {{
               "size": 14,
               "face": "Arial",
               "color": "#000000",
               "strokeWidth": 1,
               "strokeColor": "#ffffff"
-            }
-          }
-        }
+            }}
+          }}
+        }}
         """)
         
-        # Ajouter tous les sommets avec numéros à l'intérieur
+        # Ajouter tous les sommets avec labels personnalisés ou numéros
         for i in range(graph.n):
+            # Utiliser le label personnalisé si disponible, sinon le numéro
+            if node_labels and i in node_labels:
+                label = node_labels[i]
+                title = f"{label} (sommet {i})"
+            else:
+                label = str(i)
+                title = f"Sommet {i}"
+            
             net.add_node(
                 i,
-                label=str(i),  # Numéro du sommet affiché à l'intérieur
-                title=f"Sommet {i}",
+                label=label,
+                title=title,
                 color="#97c2fc",  # Couleur bleue pour les sommets
-                size=40,  # Taille du nœud pour mieux voir le numéro
+                size=node_size,
                 shape="circle",
-                font={"size": 20, "color": "#000000", "face": "Arial", "bold": True}
+                font={"size": font_size, "color": "#000000", "face": "Arial", "bold": True}
             )
         
         # Ajouter les arcs (extraits de la matrice L)
@@ -116,11 +161,17 @@ def visualize_graph(graph, output_file="graph_visualization.html", show_weights=
                     else:
                         edge_label = ""
                     
+                    # Titre de l'arc avec noms de villes si disponibles
+                    if node_labels and i in node_labels and j in node_labels:
+                        edge_title = f"{node_labels[i]} → {node_labels[j]} (poids: {weight})"
+                    else:
+                        edge_title = f"Arc {i} → {j} (poids: {weight})"
+                    
                     net.add_edge(
                         i,
                         j,
                         label=edge_label,
-                        title=f"Arc {i} → {j} (poids: {weight})",
+                        title=edge_title,
                         color=edge_color,
                         width=2
                     )
