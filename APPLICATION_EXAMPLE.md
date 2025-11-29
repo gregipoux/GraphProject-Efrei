@@ -1,51 +1,65 @@
-# Exemple d'application réelle : réseau logistique national
+# Exemple d'application réelle : marathon d'un client Amazon pressé
 
-Ce projet illustre l'usage de l'algorithme de Floyd-Warshall pour planifier les
-itinéraires les plus courts entre toutes les plateformes d'un réseau
-logistique couvrant plusieurs grandes aires urbaines françaises.
+Pour illustrer l'algorithme de Floyd-Warshall, on met en scène Jules, client
+Amazon convaincu que "livraison en un jour" est un droit constitutionnel. Il
+veut savoir quel entrepôt expédiera son nouveau grille-pain connecté le plus
+rapidement, et quels détours absurdes (ou pas) son colis pourrait emprunter
+avant d'atterrir chez lui.
 
-## Contexte métier
+## Contexte amusé mais sérieux
 
-Un opérateur e-commerce exploite douze hubs régionaux qui mutualisent le tri et
-le transfert de colis. Pour dimensionner ses tournées de nuit et identifier les
-corridors structurants, l'entreprise doit connaître, pour chaque couple de
-plateformes, le temps routier minimal.
+- Douze entrepôts européens (numérotés de 0 à 11) sont reliés par 44 arcs
+  orientés représentant des routes logistiques possibles. Les arcs peuvent avoir
+  des temps négatifs si un pilote de camion a découvert un raccourci improbable
+  ou simplement oublié d'arrêter le chrono.
+- Jules ne veut pas seulement le plus court chemin pour sa commande : il veut
+  vérifier **tous** les couples d'entrepôts afin d'anticiper d'éventuels retours
+  (parce qu'il commande parfois en double quand il clique trop vite).
+- Si un circuit absorbant se cache dans le réseau, Jules saura qu'un colis peut
+  tourner en rond éternellement — pratique pour ceux qui aiment recevoir des
+  notifications "votre colis arrive… un jour".
 
-## Données fournies
+## Données utilisées
 
-- Le réseau est modélisé par 12 sommets (hubs) et 44 arcs (liaisons routières
-  dirigées) stockés dans `graphs/g14_application.txt`.
-- Les poids d'arc représentent un temps de trajet estimé en heures pour un
-  poids-lourd de nuit.
-- Les sommets sont annotés par des hubs lisibles dans le script
-  `application_example.py` (ex. `0` = Lille, `1` = Paris, `3` = Lyon, etc.).
+- Le graphe complet est stocké dans `graphs/g14_application.txt` avec
+  `12` sommets et `44` arcs (format : nombre de sommets, nombre d'arcs puis
+  triplets "origine destination temps").
+- Les poids représentent un temps de transit estimé en heures ; des valeurs
+  négatives sont autorisées pour coller au cahier des charges.
+- `application_example.py` contient une table de correspondance humoristique
+  entre indices et villes (par exemple `0` = Lille Prime Now, `3` = Lyon
+  emballage façon origami, `11` = Marseille où l'on promet qu'aucun colis ne
+  finit à la mer).
 
-## Exécution de l'algorithme
-
-L'exemple peut être rejoué en lançant :
+## Lancer la simulation
 
 ```bash
 python application_example.py
 ```
 
-Le script charge le graphe, vérifie l'absence de cycle absorbant puis affiche
-quelques plus courts chemins représentatifs.
+Le script charge le graphe en mémoire, affiche la matrice initiale puis exécute
+Floyd-Warshall. Il signale immédiatement tout circuit absorbant (le fameux colis
+qui revient au point de départ plus vite qu'il n'en est parti) et peut afficher
+les plus courts chemins sur demande.
 
-## Résultats et interprétations
+## Résultats et interprétation pour Jules
 
-- Aucun cycle absorbant n'est détecté : les temps minimaux sont cohérents.
-- Lille → Nice : le meilleur itinéraire suit Lille → Paris → Lyon → Marseille →
-  Nice pour un temps cumulé de 14 h, ce qui met en évidence le rôle central du
-  corridor Paris–Lyon pour desservir la Côte d'Azur.
-- Toulouse → Nice : le chemin optimal passe par Montpellier puis Marseille (9 h
-  au total), confirmant la pertinence d'un axe méditerranéen sans remontée vers
-  le nord.
-- Rennes → Marseille : la route la plus rapide exploite l'axe Rennes → Bordeaux
-  → Montpellier → Marseille (9 h), illustrant l'intérêt du hub bordelais pour
-  accélérer les flux ouest–est.
-- Strasbourg → Montpellier : la solution Strasbourg → Clermont-Ferrand →
-  Montpellier (8 h) montre que la diagonale est–sud peut éviter Paris tout en
-  restant compétitive.
+- Aucun circuit absorbant n'apparaît : aucun chauffeur ne fait la course à
+  l'infini pour booster son compteur de kilomètres.
+- Commande depuis Lille (`0`) vers Nice (`10`) : chemin
+  `Lille → Paris → Lyon → Marseille → Nice` en environ 14 h. Jules comprend que
+  la Côte d'Azur reste dépendante de l'axe Paris–Lyon, sauf si un drone géant
+  est disponible.
+- Retour de Nice (`10`) vers Bordeaux (`9`) : itinéraire optimal
+  `Nice → Marseille → Clermont-Ferrand → Bordeaux` (8 h). Le grille-pain fera un
+  détour gastronomique avant d'arriver chez Mamie.
+- Paris (`1`) vers Strasbourg (`4`) : route la plus rapide
+  `Paris → Lyon → Strasbourg` (9 h). Jules se dit que même son panier voyage plus
+  que lui.
+- Toulouse (`7`) vers Lille (`0`) : meilleur chemin `Toulouse → Paris → Lille`
+  (8 h) ; pas besoin d'envoyer le colis faire un stage à Marseille.
 
-Ces résultats peuvent ensuite être intégrés dans la planification des tournées
-ou l'ouverture de nouvelles liaisons directes si certains arcs sont saturés.
+Ces résultats montrent que la couche logistique Amazon de Jules respecte le
+cahier des charges : un graphe orienté, valué, sans limite sur les poids ni le
+nombre d'arcs, et un client qui peut enfin suivre ses colis en temps (presque)
+réel… avec un sourire en prime.
